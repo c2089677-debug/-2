@@ -104,6 +104,10 @@ export function getRoom(roomCode) {
   return rooms.get(roomCode);
 }
 
+export function deleteRoom(roomCode) {
+  rooms.delete(roomCode);
+}
+
 export function startGame(roomCode) {
   const room = rooms.get(roomCode);
   if (!room) throw new Error("Room not found");

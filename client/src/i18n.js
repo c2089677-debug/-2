@@ -102,27 +102,28 @@ const translations = {
     selectedCard: 'Selected',
     waitingForOthers: 'Waiting for other players...',
     dawnPhase: '🌅 Dawn',
-    dawnDesc: 'Close your eyes. Ability users are acting.',
-    dayPhase: '☀️ Daytime',
-    dayDesc: 'Time to discuss! Figure out who the werewolf is.',
+    dawnDesc: 'Close your eyes. Ability users take action.',
+    dayPhase: '☀️ Day',
+    dayDesc: 'Discuss! Who is the werewolf?',
     afternoonPhase: '🌤️ Afternoon',
-    afternoonDesc: 'Ability users are acting.',
+    afternoonDesc: 'Ability users take action.',
     votePhase: '🗳️ Evening - Vote',
-    voteDesc: 'Vote for who you want to eliminate.',
+    voteDesc: 'Vote to eliminate a player.',
     chooseTarget: 'Choose a target',
     confirm: 'Confirm',
     skip: 'Skip',
     voteFor: 'Vote for {name}',
-    result: 'Results',
+    result: 'Show Results',
     eliminated: '{name} was eliminated',
-    noOneEliminated: 'Tied vote — no one was eliminated',
+    noOneEliminated: 'No one was eliminated (tie vote)',
     villageWins: '🎉 Village Team Wins!',
     werewolfWins: '🐺 Werewolf Team Wins!',
-    ghostWins: '👻 Ghost Wins Alone!',
+    ghostWins: '👻 Ghost Solo Win!',
     playAgain: 'Play Again',
     backToHome: 'Back to Home',
     copied: 'Copied!',
-    shareCode: 'Share Code',
+    shareCode: 'Share this code',
+    // Role names
     werewolf: 'Werewolf',
     traitor: 'Traitor',
     villager: 'Villager',
@@ -130,27 +131,30 @@ const translations = {
     police: 'Police',
     dj: 'DJ',
     ghost: 'Ghost',
-    werewolfDesc: 'See your fellow werewolves',
-    traitorDesc: 'Win with the werewolf team',
+    // Role descriptions
+    werewolfDesc: 'See who your fellow werewolves are',
+    traitorDesc: 'Fight for the werewolf team',
     villagerDesc: 'Find the werewolf through discussion',
     fortuneTellerDesc: 'Peek at one player\'s play card',
-    policeDesc: 'Peek at one player\'s field card',
-    djDesc: 'Swap one player\'s play ↔ field card',
+    policeDesc: 'Check one player\'s field card',
+    djDesc: 'Swap one player\'s cards',
     ghostDesc: 'Win alone if you get eliminated!',
+    // Dawn phase
     youAreWerewolf: 'You are a Werewolf 🐺',
     fellowWerewolves: 'Fellow werewolves:',
-    noFellowWerewolves: 'No fellow werewolves (you are alone)',
+    noFellowWerewolves: 'No fellow werewolves (you\'re alone)',
     youAreFortuneTeller: 'You are the Fortune Teller 🔮',
-    choosePeekTarget: 'Whose play card do you want to see?',
+    choosePeekTarget: 'Whose play card would you like to see?',
     peekResult: '{name}\'s play card is "{role}"',
-    youAreTraitor: 'You are a Traitor 🗡️',
-    werewolvesAre: 'The werewolves are:',
-    noAbility: 'You have no ability. Wait for the next phase.',
+    youAreTraitor: 'You are the Traitor 🗡️',
+    werewolvesAre: 'Werewolves are:',
+    noAbility: 'No special ability. Wait for the next phase.',
+    // Afternoon phase
     youArePolice: 'You are the Police 🚔',
-    chooseFieldTarget: 'Whose field card do you want to see?',
+    chooseFieldTarget: 'Whose field card would you like to see?',
     fieldResult: '{name}\'s field card is "{role}"',
     youAreDJ: 'You are the DJ 🎧',
-    chooseSwapTarget: 'Whose cards do you want to swap?',
+    chooseSwapTarget: 'Whose cards would you like to swap?',
     swapDone: 'Swapped {name}\'s play card and field card',
     playCard: 'Play Card',
     fieldCard: 'Field Card',
@@ -161,29 +165,29 @@ const translations = {
   }
 };
 
-let currentLang = 'ja';
+let currentLang = localStorage.getItem('lang') || 'ja';
 
 export function setLang(lang) {
   currentLang = lang;
-  document.documentElement.lang = lang;
+  localStorage.setItem('lang', lang);
 }
+export function getLang() { return currentLang; }
 
-export function getLang() {
-  return currentLang;
-}
-
-export function t(key, params = {}) {
-  let str = translations[currentLang]?.[key] || translations.ja[key] || key;
-  Object.entries(params).forEach(([k, v]) => {
-    str = str.replace(`{${k}}`, v);
-  });
+export function t(key, params) {
+  const dict = translations[currentLang] || translations.ja;
+  let str = dict[key] || translations.ja[key] || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      str = str.replace(`{${k}}`, v);
+    }
+  }
   return str;
 }
 
-export function tRole(roleId) {
-  return t(roleId);
+export function tRole(key) {
+  return t(key);
 }
 
-export function tRoleDesc(roleId) {
-  return t(roleId + 'Desc');
+export function tRoleDesc(key) {
+  return t(key + 'Desc') || '';
 }
