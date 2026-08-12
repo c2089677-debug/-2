@@ -370,11 +370,6 @@ function renderDay() {
   state.phase = 'day';
   state.myVotedEndDisc = false;
   state.endDiscVotes = 0;
-  const playersHtml = state.players.map(p =>
-    `<div class="grid-item">
-      <div class="player-avatar">${p.name.charAt(0).toUpperCase()}</div>
-      <div class="player-name">${p.name}</div>
-    </div>`).join('');
 
   render(`
     <div class="phase-banner phase-day" style="margin-top:40px;">
@@ -390,8 +385,6 @@ function renderDay() {
         <button class="chat-send" id="chat-send">➤</button>
       </div>
     </div>
-
-    <div class="player-grid" style="margin-bottom:16px;">${playersHtml}</div>
 
     <div class="end-disc-btn-wrap">
       <button id="btn-end-disc" class="btn danger">
