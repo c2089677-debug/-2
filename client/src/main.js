@@ -108,8 +108,7 @@ function renderTitle() {
   state.phase = 'title';
   render(`
     <div class="title-logo-area">
-      <h1>${t('appTitle')}</h1>
-      <div class="title-subtitle">${t('appSubtitle')}</div>
+      <!-- Background image already contains logo text -->
     </div>
     <button id="btn-title-start" class="btn primary title-btn-start">
       ${t('pressStart')}
