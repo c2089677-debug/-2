@@ -18,11 +18,12 @@ const roleEmoji = r => ROLE_EMOJIS[roleKey(r)] || '❓';
 
 // ── Game State ──
 const state = {
-  phase: 'home', roomCode: null, players: [], myId: null,
+  phase: 'title', roomCode: null, players: [], myId: null,
   isHost: false, myName: '', card1: null, card2: null,
   myPlayCard: null, selectionProgress: { selected: 0, total: 0 },
   endDiscVotes: 0, voteResultData: null, gameResultData: null,
   chatMessages: [], myVotedEndDisc: false,
+  showingResult: false, pendingPhase: null, // Controls result overlay block
 };
 
 // ── Phase timers (client-side countdown) ──
@@ -63,7 +64,7 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-function render(html, onMount) {
+function render(html, onMount, customClass = '') {
   stopCountdown();
   app.innerHTML = '';
 
@@ -74,7 +75,7 @@ function render(html, onMount) {
   document.body.appendChild(langBtn);
 
   const screen = document.createElement('div');
-  screen.className = 'screen active';
+  screen.className = `screen active ${customClass}`;
   screen.innerHTML = html;
   app.appendChild(screen);
   if (onMount) onMount(screen);
@@ -85,6 +86,7 @@ function rerender() { switchTo(state.phase); }
 function switchTo(phase) {
   state.phase = phase;
   switch (phase) {
+    case 'title':     renderTitle(); break;
     case 'home':      renderHome(); break;
     case 'lobby':     renderLobby(); break;
     case 'selecting': renderCardSelect(); break;
@@ -94,8 +96,29 @@ function switchTo(phase) {
     case 'vote':      renderVote(); break;
     case 'vote-result': renderVoteResult(); break;
     case 'result':    renderResult(); break;
-    default:          renderHome();
+    default:          renderTitle();
   }
+}
+
+// ══════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════
+
+function renderTitle() {
+  state.phase = 'title';
+  render(`
+    <div class="title-logo-area">
+      <h1>${t('appTitle')}</h1>
+      <div class="title-subtitle">${t('appSubtitle')}</div>
+    </div>
+    <button id="btn-title-start" class="btn primary title-btn-start">
+      ${t('pressStart')}
+    </button>
+  `, (el) => {
+    el.querySelector('#btn-title-start').onclick = () => {
+      switchTo('home');
+    };
+  }, 'screen-title');
 }
 
 // ══════════════════════════════════════════════
@@ -709,15 +732,33 @@ socket.on('selection-progress', (data) => {
   updateSelProgress();
 });
 
+function closeResult() {
+  state.showingResult = false;
+  if (state.pendingPhase) {
+    const nextPhase = state.pendingPhase;
+    state.pendingPhase = null;
+    switchTo(nextPhase);
+  } else {
+    const screen = document.querySelector('.screen');
+    if (screen) showWaitingInEl(screen);
+  }
+}
+
 socket.on('phase-changed', (data) => {
   stopCountdown();
-  switchTo(data.phase);
+  if (state.showingResult) {
+    state.pendingPhase = data.phase;
+  } else {
+    switchTo(data.phase);
+  }
 });
 
 socket.on('dawn-result', (data) => {
   const rk = roleKey(state.myPlayCard);
   const screen = document.querySelector('.screen');
   if (!screen) return;
+
+  state.showingResult = true;
 
   if (rk === 'werewolf') {
     const wolves = Array.isArray(data.targetRole) ? data.targetRole : [];
@@ -731,8 +772,11 @@ socket.on('dawn-result', (data) => {
     if (btn) {
       stopCountdown();
       btn.disabled = false;
-      btn.textContent = `✅ ${t('confirm')}`;
-      btn.onclick = () => { socket.emit('dawn-skip'); showWaitingInEl(screen); };
+      btn.textContent = `✅ OK`;
+      btn.onclick = () => {
+        socket.emit('dawn-skip');
+        closeResult();
+      };
     }
   } else if (rk === 'fortuneTeller') {
     stopCountdown();
@@ -747,7 +791,9 @@ socket.on('dawn-result', (data) => {
           <p style="font-size:1.05rem;font-weight:700;color:var(--gold);">${t('peekResult', { name: targetName, role: tRole(fk) })}</p>
           <button id="btn-ok" class="btn primary" style="margin-top:16px;">✅ OK</button>
         </div>`;
-      screen.querySelector('#btn-ok').onclick = () => showWaitingInEl(screen);
+      screen.querySelector('#btn-ok').onclick = () => {
+        closeResult();
+      };
     }
   } else if (rk === 'traitor') {
     const wolves = Array.isArray(data.targetRole) ? data.targetRole : [];
@@ -761,8 +807,11 @@ socket.on('dawn-result', (data) => {
     if (btn) {
       stopCountdown();
       btn.disabled = false;
-      btn.textContent = `✅ ${t('confirm')}`;
-      btn.onclick = () => { socket.emit('dawn-skip'); showWaitingInEl(screen); };
+      btn.textContent = `✅ OK`;
+      btn.onclick = () => {
+        socket.emit('dawn-skip');
+        closeResult();
+      };
     }
   }
 });
@@ -774,6 +823,8 @@ socket.on('afternoon-result', (data) => {
   if (!screen) return;
   const actionEl = screen.querySelector('#aft-action');
   if (!actionEl) return;
+
+  state.showingResult = true;
 
   const target = state.players.find(p => p.id === screen.querySelector('.grid-item.selected')?.dataset?.id);
   const targetName = target?.name || '?';
@@ -794,7 +845,9 @@ socket.on('afternoon-result', (data) => {
         <button id="btn-ok" class="btn primary" style="margin-top:16px;">✅ OK</button>
       </div>`;
   }
-  screen.querySelector('#btn-ok')?.addEventListener('click', () => showWaitingInEl(screen));
+  screen.querySelector('#btn-ok')?.addEventListener('click', () => {
+    closeResult();
+  });
 });
 
 socket.on('chat-message', (data) => {

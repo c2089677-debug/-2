@@ -119,6 +119,49 @@ body::before {
   min-height: 100vh;
 }
 
+/* Title Screen with custom background */
+.screen-title {
+  background: linear-gradient(to bottom, rgba(6, 6, 14, 0.4) 0%, rgba(6, 6, 14, 0.9) 100%), url('/main_bg.jpg') no-repeat center top;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 48px 24px 64px;
+}
+.title-logo-area {
+  text-align: center;
+  margin-top: 20px;
+}
+.title-logo-area h1 {
+  font-size: 3.2rem;
+  letter-spacing: 4px;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.9);
+}
+.title-subtitle {
+  color: var(--moonlight);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  margin-top: 10px;
+}
+.title-btn-start {
+  width: 80%;
+  max-width: 280px;
+  height: 60px;
+  font-size: 1.3rem;
+  letter-spacing: 4px;
+  font-family: var(--font-title);
+  box-shadow: 0 0 30px rgba(196,30,58,0.6);
+  animation: startButtonGlow 2s infinite alternate;
+}
+@keyframes startButtonGlow {
+  0% { box-shadow: 0 0 15px rgba(196,30,58,0.4); transform: scale(1); }
+  100% { box-shadow: 0 0 35px rgba(196,30,58,0.9); transform: scale(1.03); }
+}
+
+
 /* ══════════════════════════════════
    TYPOGRAPHY
 ══════════════════════════════════ */

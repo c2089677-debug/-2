@@ -2,6 +2,7 @@ const translations = {
   ja: {
     appTitle: '人狼どっち？',
     appSubtitle: 'オンライン人狼カードゲーム',
+    pressStart: 'スタート',
     createRoom: '部屋を作る',
     joinRoom: '部屋に入る',
     randomMatch: 'ランダムマッチで遊ぶ',
@@ -84,6 +85,7 @@ const translations = {
   en: {
     appTitle: 'Werewolf Which?',
     appSubtitle: 'Online Werewolf Card Game',
+    pressStart: 'START',
     createRoom: 'Create Room',
     joinRoom: 'Join Room',
     randomMatch: 'Play Random Match',
