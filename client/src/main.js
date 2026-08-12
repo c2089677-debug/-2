@@ -704,7 +704,7 @@ function showWaitingInEl(el) {
 
 socket.on('connect', () => {
   state.myId = socket.id;
-  if (!state.roomCode) renderHome();
+  if (!state.roomCode) switchTo('title');
 });
 socket.on('disconnect', () => showToast(t('disconnected')));
 socket.on('error', (data) => showToast(typeof data === 'string' ? data : (data?.message || 'Error')));
@@ -881,8 +881,8 @@ socket.on('game-abandoned', () => {
   stopCountdown();
   showToast(getLang() === 'ja' ? '時間切れで試合が中断されました' : 'Match abandoned due to timeout');
   state.roomCode = null; state.players = [];
-  renderHome();
+  switchTo('title');
 });
 
 // ── Boot ──
-renderHome();
+switchTo('title');
